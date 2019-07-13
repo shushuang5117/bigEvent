@@ -24,19 +24,19 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">用户名称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" value="李思思">
+                        <input type="text" name="username" class="form-control username" id="inputEmail3" value="李思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">昵称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" value="思思">
+                        <input type="text" name="nickname" class="form-control nickname" id="inputEmail3" value="思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" value="lisisi@126.com">
+                        <input type="text" name="email" class="form-control email" id="inputEmail3" value="lisisi@126.com">
                     </div>
                 </div>
                 
@@ -44,26 +44,71 @@
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
                         <img src="images/2.jpg" alt="" class="user_pic">
-                        <input type="file" id="exampleInputFile">
+                        <input type="file" id="exampleInputFile" name='user_pic'>
                     </div>
                 </div>
 
                 <div class="form-group">
                         <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
                         <div class="col-sm-4">
-                            <input type="password" class="form-control" id="inputEmail3" value="12345678">
+                            <input type="password" name='password' class="form-control password" id="inputEmail3" value="12345678">
                         </div>
                     </div>
                
     
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">修改</button>
+                        <button type="submit" class="btn btn-success btn-edit">修改</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <script>
+        $(function(){
+            //给图片一个change事件
+            $('#exampleInputFile').change(function(){
+                var iconImg=this.files[0];
+                var url=URL.createObjectURL(iconImg);
+                $('.user_pic').attr('src',url);
+            });
+
+            //进入页面将获取个人信息显示在对应的标签上
+            $.ajax({
+                url:'http://localhost:8000/admin/userinfo_get',
+                success:function(res){
+                    if(res.code==200){
+                        for(var key in res.data){
+                            $('.'+key).val(res.data[key]);
+
+                        }
+                        $('.user_pic').attr('src',res.data.user_pic);
+
+                    }
+                }
+            });
+            //修改用户信息
+            $('.btn-edit').click(function(e){
+                e.preventDefault();
+                var form=new FormData($('form')[0]);
+                $.ajax({
+                    type:'post',
+                    url:'http://localhost:8000/admin/userinfo_edit',                  
+                    data:form,
+                    contentType:false,
+                    processData:false,
+                    success:function(res){
+                        if(res.code==200){
+                            parent.location.reload;
+                        }
+                    }
+                })
+            })
+
+
+        })
+    
+    </script>
 
 </body>
 
