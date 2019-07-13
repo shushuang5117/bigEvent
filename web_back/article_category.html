@@ -130,6 +130,55 @@
               }
           })      
       </script>
+      <script src="./js/template-web.js"></script>
+      <script type="text/html" id="tpl">
+    {{each data v}}
+    
+         <tr>
+            <td>{{v.name}}</td>
+            <td>{{v.slug}}</td>
+            <td class="text-center">
+                <a href="javascript:editTr({&quot;id&quot;:&quot;3&quot;,&quot;slug&quot;:&quot;living&quot;,&quot;name&quot;:&quot;会生活&quot;});"
+                    class="btn btn-info btn-xs">编辑</a>
+                <a href="javascript:deleteTr( {{v.id}} );" class="btn btn-danger btn-xs">删除</a>
+            </td>
+        </tr>
+    {{/each}}
+    </script>
+    <script>
+        $(function(){
+
+            $.ajax({
+                url:'http://localhost:8000/admin/category_search',
+                success:function(res){
+                    if(res.code==200){
+                        var html=template('tpl',res);
+                        $('tbody').html(html);
+                    }
+                }
+
+            });
+            //新增文章分类
+            $('#model_add').click(function(){
+                var cateName=$('#recipient-name').val().trim();
+                var cateSlug=$('#recipient-slug').val().trim();
+                $.ajax({
+                    type:'post',
+                    url:'http://localhost:8000/admin/category_add',
+                    data:{
+                        name:cateName,
+                        slug:cateSlug,
+                    },
+                    success:function(res){
+                        if(res.code==200){
+                            location.reload();
+                        }
+                    }
+                })
+            })
+        })
+    
+    </script>
 
 </body>
 
