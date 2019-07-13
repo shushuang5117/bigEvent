@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/jquery-1.12.4.min.js"></script>
+    <!-- 导入bootstrap的js文件 -->
+    <script src="./js/bootstrap/js/bootstrap.min.js"></script>
 
 </head>
 
@@ -36,10 +38,11 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" name="email" class="form-control email" id="inputEmail3" value="lisisi@126.com">
+                        <input type="text" name="email" class="form-control email" id="inputEmail3"
+                            value="lisisi@126.com">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
@@ -49,13 +52,14 @@
                 </div>
 
                 <div class="form-group">
-                        <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
-                        <div class="col-sm-4">
-                            <input type="password" name='password' class="form-control password" id="inputEmail3" value="12345678">
-                        </div>
+                    <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
+                    <div class="col-sm-4">
+                        <input type="password" name='password' class="form-control password" id="inputEmail3"
+                            value="12345678">
                     </div>
-               
-    
+                </div>
+
+
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
                         <button type="submit" class="btn btn-success btn-edit">修改</button>
@@ -64,50 +68,106 @@
             </form>
         </div>
     </div>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">温馨提示</h4>
+                </div>
+                <div class="modal-body">
+                    修改成功
+                </div>
+                <div class="modal-footer">
+             
+                    <button type="button" class="btn btn-primary">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
-        $(function(){
+        $(function () {
+
+
+
             //给图片一个change事件
-            $('#exampleInputFile').change(function(){
-                var iconImg=this.files[0];
-                var url=URL.createObjectURL(iconImg);
-                $('.user_pic').attr('src',url);
+            $('#exampleInputFile').change(function () {
+                var iconImg = this.files[0];
+                var url = URL.createObjectURL(iconImg);
+                $('.user_pic').attr('src', url);
             });
 
             //进入页面将获取个人信息显示在对应的标签上
             $.ajax({
-                url:'http://localhost:8000/admin/userinfo_get',
-                success:function(res){
-                    if(res.code==200){
-                        for(var key in res.data){
-                            $('.'+key).val(res.data[key]);
+                url: 'http://localhost:8000/admin/userinfo_get',
+                success: function (res) {
+                    if (res.code == 200) {
+                        for (var key in res.data) {
+                            $('.' + key).val(res.data[key]);
 
                         }
-                        $('.user_pic').attr('src',res.data.user_pic);
+                        $('.user_pic').attr('src', res.data.user_pic);
 
                     }
                 }
             });
+
+
+    
+
             //修改用户信息
-            $('.btn-edit').click(function(e){
-                e.preventDefault();
-                var form=new FormData($('form')[0]);
-                $.ajax({
-                    type:'post',
-                    url:'http://localhost:8000/admin/userinfo_edit',                  
-                    data:form,
-                    contentType:false,
-                    processData:false,
-                    success:function(res){
-                        if(res.code==200){
-                            parent.location.reload;
-                        }
-                    }
-                })
-            })
+              $('.btn-edit').click(function (e) {
+                 e.preventDefault();
+                 var form = new FormData($('form')[0]);
+                 $.ajax({
+                     type: 'post',
+                     url: 'http://localhost:8000/admin/userinfo_edit',
+                     data: form,
+                     contentType: false,
+                     processData: false,
+                    
+                     success: function (res) {
+                                         
+                         if (res.code == 200) {
+                             // parent.location.reload;
+                             $('#myModal').modal()
+                             $('.btn-primary').click(function(){
+                                 $.get({
+                                     url:'http://localhost:8000/admin/getuser',
+                                     success:function(res){
+                                        if(res.code==200){
+                                            parent.$('.user_info')
+                                                .children(
+                                                    'span').html(
+                                                    '欢迎&nbsp;&nbsp;' +
+                                                    backData.data
+                                                    .nickname);
+                                            parent.$('.user_info')
+                                                .children(
+                                                    'img').attr('src',
+                                                    backData.data
+                                                    .user_pic);
+
+                                            parent.$(
+                                                    '.user_center_link')
+                                                .children('img').attr(
+                                                    'src', backData.data
+                                                    .user_pic);    
+                                        }
+                                     }
+                                 })
+                                 $('#myModal').modal('hide');
+                             })
+                         }
+                     }
+                 })
+             }) 
 
 
         })
-    
+
     </script>
 
 </body>
