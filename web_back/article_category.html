@@ -72,112 +72,178 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增分类</a>
+                            <a href="#" class="btn btn-success btnAddCate" data-toggle="modal" data-target="#addModal">新增分类</a>
                         </td>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
-
-    <div class="modal fade" id="addModal" >
+    <!-- 模态框 -->
+    <div class="modal fade" id="addModal">
         <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
-              <h4 class="modal-title">新增分类</h4>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="form-group">
-                  <label for="recipient-name" class="control-label">分类名称:</label>
-                  <input type="text" class="form-control" id="recipient-name">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title">新增分类</h4>
                 </div>
-                <div class="form-group">
-                  <label for="message-text" class="control-label">分类别名:</label>
-                  <input type="text" class="form-control" id="recipient-name">
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" name="id" class="id">
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">分类名称:</label>
+                            <input type="text" name="name" class="form-control name" id="recipient-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">分类别名:</label>
+                            <input type="text" name="slug" class="form-control slug" id="recipient-slug">
+                        </div>
+                    </form>
                 </div>
-              </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="model_shutoff">关闭</button>
+                    <button type="button" class="btn btn-primary" id="model_add">新增</button>
+                </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" id="model_shutoff">关闭</button>
-              <button type="button" class="btn btn-primary" id="model_add">新增</button>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
 
-      <script>
-          $('#addModal').modal({
-            show:false,
-            backdrop:false
-          });
+    <script>
+        $('#addModal').modal({
+            show: false,
+            backdrop: false
+        });
 
-          $('#model_shutoff').click(function(){
+        $('#model_shutoff').click(function () {
             alert('shutoff');
             $('#addModal').modal('hide');
-          });
+        });
 
-          $('#model_add').click(function(){
+        $('#model_add').click(function () {
             alert('add');
             $('#addModal').modal('hide');
-          });
+        });
 
-          $('.category_table').delegate('a','click',function(){
-              if($(this).hasClass('btn-info')){
+        $('.category_table').delegate('a', 'click', function () {
+            if ($(this).hasClass('btn-info')) {
                 $('#addModal .modal-title').html('修改分类名称');
                 $('#addModal').modal('show');
-              }
-          })      
-      </script>
-      <script src="./js/template-web.js"></script>
-      <script type="text/html" id="tpl">
+            }
+        })      
+    </script>
+    <script src="./js/template-web.js"></script>
+    <script type="text/html" id="tpl">
     {{each data v}}
     
          <tr>
             <td>{{v.name}}</td>
             <td>{{v.slug}}</td>
             <td class="text-center">
-                <a href="javascript:editTr({&quot;id&quot;:&quot;3&quot;,&quot;slug&quot;:&quot;living&quot;,&quot;name&quot;:&quot;会生活&quot;});"
-                    class="btn btn-info btn-xs">编辑</a>
-                <a href="javascript:deleteTr( {{v.id}} );" class="btn btn-danger btn-xs">删除</a>
+                <a href="#" data-id='{{v.id}}' class="btn btn-info btn-xs btn-edit">编辑</a>
+                <a href="#" data-id=" {{v.id}} " class="btn btn-danger btn-xs btn-delete">删除</a>
             </td>
         </tr>
     {{/each}}
     </script>
     <script>
-        $(function(){
-
-            $.ajax({
-                url:'http://localhost:8000/admin/category_search',
-                success:function(res){
-                    if(res.code==200){
-                        var html=template('tpl',res);
-                        $('tbody').html(html);
-                    }
-                }
-
-            });
-            //新增文章分类
-            $('#model_add').click(function(){
-                var cateName=$('#recipient-name').val().trim();
-                var cateSlug=$('#recipient-slug').val().trim();
+        $(function () {
+            function getData() {
                 $.ajax({
-                    type:'post',
-                    url:'http://localhost:8000/admin/category_add',
-                    data:{
-                        name:cateName,
-                        slug:cateSlug,
-                    },
-                    success:function(res){
-                        if(res.code==200){
-                            location.reload();
+                    url: 'http://localhost:8000/admin/category_search',
+                    success: function (res) {
+                        if (res.code == 200) {
+                            var html = template('tpl', res);
+                            $('tbody').html(html);
                         }
                     }
-                })
+
+                });
+            }
+            //需求:一进来就发送请求,显示所有的文章类别
+            getData();
+
+            //新增文章分类
+            $('#model_add').click(function () {
+                if ($(this).hasClass('btn-success')) {
+                    // var cateName = $('#recipient-name').val().trim();
+                    // var cateSlug = $('#recipient-slug').val().trim();
+                    var data = $('.modal-body form').serialize();
+
+                    $.ajax({
+                        type: 'post',
+                        url: 'http://localhost:8000/admin/category_edit',
+                        // data: {
+                        //     name: cateName,
+                        //     slug: cateSlug,
+                        // },
+                        data: data,
+                        success: function (res) {
+                            if (res.code == 200) {
+                                alert('修改成功了')
+                                // location.reload();
+                                getData();
+                            }
+                        }
+                                                                       
+                    });
+                }else{
+                    var cateName=$('#recipient-name').val().trim();
+                    var cateSlug=$('#recipient-slug').val().trim();
+                    $.post({
+                        url:'http://localhost:8000/admin/category_add',
+                        date:{
+                            name:cateName,
+                            slug:cateSlug,
+                        },
+                        success:function(res){
+                            if(res.code==200){
+                                getData();
+                            }
+                        }
+                    });
+
+                }
+                $('#addModal').modal('hide');
+            });
+
+
+            //需求:点击新增分类 按钮 ,模态框中的title 和按钮还原
+            $('.btnAddCate').click(function(){
+                $('#addModal .modal-title').html('新增分类');
+                $('#model_add').text('新增').removeClass('btn-success');
             })
-        })
-    
+            //需求:编辑文章类别.委托注册事件
+            $('tbody').on('click','.btn-edit',function(){
+                $('#addModal .modal-title').html('修改分类');
+                $('#model_add').text('修改').addClass('btn-success');
+                var id=$(this).attr('data-id');
+                var name=$(this).parent().prev().prev().text();
+                var slug=$(this).parent().prev().text();
+                $('form .id').val(id);
+                $('form .name').val(name);
+                $('form .slug').val(slug);
+                $('#addModal').modal('show');
+            });
+            //需求:删除文章分类
+
+            $('tbody').on('click','.btn-delete', function(e){
+                e.preventDefault();
+                if(confirm('确认删除?')){
+                    var cateId=$(this).attr('data-id');
+                    var that=this;
+                    $.post({
+                        url:'http://localhost:8000/admin/category_delete',
+                        data:{id:cateId},
+                        success:function(res){
+                            if(res.code==200){
+                                this.parents('tr').remove();
+                            }
+                        }
+                    })
+                }
+            })
+
+        });
     </script>
 
 </body>
