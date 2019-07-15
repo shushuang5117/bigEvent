@@ -142,18 +142,18 @@
                                                 .children(
                                                     'span').html(
                                                     '欢迎&nbsp;&nbsp;' +
-                                                    backData.data
+                                                    res.data
                                                     .nickname);
                                             parent.$('.user_info')
                                                 .children(
                                                     'img').attr('src',
-                                                    backData.data
+                                                    res.data
                                                     .user_pic);
 
                                             parent.$(
                                                     '.user_center_link')
                                                 .children('img').attr(
-                                                    'src', backData.data
+                                                    'src', res.data
                                                     .user_pic);    
                                         }
                                      }
