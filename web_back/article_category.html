@@ -191,7 +191,7 @@
                     var cateSlug=$('#recipient-slug').val().trim();
                     $.post({
                         url:'http://localhost:8000/admin/category_add',
-                        date:{
+                        data:{
                             name:cateName,
                             slug:cateSlug,
                         },
