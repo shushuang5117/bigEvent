@@ -11,10 +11,11 @@
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <link type="text/css" rel="stylesheet" href="js/jedate/css/jedate.css">
-    <script src="js/jquery-1.12.4.min.js"></script>
-    <script src="js/jedate/js/jedate.js"></script>
-    <script src="js/tinymce/js/tinymce/tinymce.min.js"></script>
-    <script src="js/tinymce/js/tinymce_setup.js"></script>
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <script src="./js/jedate/js/jedate.js"></script>
+    <script src="./js/tinymce/js/tinymce/tinymce.min.js"></script>
+    <script src="../../../其他/02-moment.js插件的使用/moment.js"></script>
+    <script src="./js/tinymce/js/tinymce_setup.js"></script>
 </head>
 
 <body>
@@ -27,19 +28,20 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章标题：</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="inputEmail3" placeholder="文章标题">
+                        <input type="email" name="title" class="form-control" id="inputEmail3" placeholder="文章标题">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
-                        <input type="file" id="exampleInputFile">
+                        <img src="" alt="" style="height:150px"><br>
+                        <input type="file" name="cover" id="exampleInputFile">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章类别：</label>
                     <div class="col-sm-4">
-                        <select class="form-control">
+                        <select class="form-control art-cate" name="type">
                             <option>1</option>
                             <option>2</option>
                             <option>3</option>
@@ -53,7 +55,7 @@
                     <div class="col-sm-4">
 
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="YYYY-MM-DD" id="dateinput">
+                            <input type="text" class="form-control date-input" name="date" placeholder="YYYY-MM-DD" id="dateinput">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="button"
                                     onclick="jeDate('#dateinput',{trigger:false,format: 'YYYY-MM-DD'})"><i
@@ -72,14 +74,71 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">发布</button>
+                        <button type="submit" class="btn btn-success btn-release">发布</button>
                         <button type="submit" class="btn btn-default">存为草稿</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <script src="./js/template-web.js"></script>
+    <script type="text/html" id="cate">
+       {{each data v}} 
 
+       <option value='{{v.id}}'>{{v.name}}</option>
+       {{/each}} 
+    
+    </script>
+    <script>
+        $(function(){
+            //图片预览
+            $('#exampleInputFile').change(function(){
+                var file=this.files[0];
+                var url=URL.createObjectURL(file);
+                $(this).prev().prev().attr('src',url);
+
+            });
+            //获取文章类别
+            $.get({
+                url:'http://localhost:8000/admin/category_search',
+                success:function(res){
+                    console.log(res);
+                    if(res.code==200){
+                        var html=template('cate',res);
+                        $('.art-cate').html(html);
+                    }
+                }
+            });
+
+            //需求:一进入文章发表页面获取当前时间
+            var currentTime=moment().format('YYYY-MM-DD');
+            $('.date-input').val(currentTime);
+
+            //需求:点击按钮发布文章
+            $('.btn-release').click(function(){
+                var form=new FormData($('form')[0]);
+                form.append('state','草稿');
+                form.append('content',tinyMCE.activeEditor.getContent());
+                $.post({
+                    url:'http://localhost:8000/admin/article_publish',
+                    data:form,
+                    contentType:false,
+                    processData:false,
+                    success:function(res){
+                        if(res.code==201){
+                            alert('发布成功了')
+                        }
+                    }
+                })
+            });
+            
+
+
+
+
+        })
+    
+    </script>
 </body>
 
 </html>
