@@ -319,6 +319,21 @@
                 }
             });
             //需求:发送请求查询对应的文章,显示在页面上
+            var mytotalPage = 10;
+            //需求:分页;
+            var $pagination = $('.pagination');
+            var defaultOpts = {
+                totalPages: mytotalPage,
+                visiblePages: 5,
+                first: '首页',
+                prev: '上一页',
+                next: '下一页',
+                last: '尾页',
+                onPageClick: function (event, page) {
+                    getData(page);
+                }
+            };
+            $pagination.twbsPagination(defaultOpts);
 
             function getData(page) {
                 var category = $('#selCategory').val();
@@ -337,6 +352,19 @@
                         var html = template('art-list', res);
                         $('tbody').html(html);
 
+                        var totalPages = res.totalPage;
+                        if (mytotalPage != totalPages) {
+                            mytotalPage=totalPages;
+
+                            var currentPage = $pagination.twbsPagination('getCurrentPage');
+                            $pagination.twbsPagination('destroy');
+                            $pagination.twbsPagination($.extend({}, defaultOpts, {
+                                startPage: 1,
+                                totalPages: totalPages
+                            }));
+                        }
+
+
                     }
                 });
 
@@ -347,20 +375,12 @@
                 getData(1);
             });
 
-            $('#btnSearch').trigger('click');
+            // $('#btnSearch').trigger('click');
 
             //分页插件
-            $('.pagination').twbsPagination({
-                totalPages: 20,
-                visiblePages: 5,
-                first:'首页',
-                prev:'上一页',
-                next:'下一页',
-                last:'尾页',
-                onPageClick: function (event, page) {
-                    getData(page);
-                }
-            });
+            // $('.pagination').twbsPagination({
+
+            // });
         })
 
     </script>
