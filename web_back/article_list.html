@@ -242,7 +242,7 @@
 
                         <td class="text-center">
                             <a href="post-edit.html?id=995" class="btn btn-default btn-xs">编辑</a>
-                            <a href="javascript:deleteTr( 995 );" class="btn btn-danger btn-xs">删除</a>
+                            <a href="javascript:deleteTr( 995 );" class="btn btn-danger btn-xs btn-delete">删除</a>
                         </td>
                     </tr>
 
@@ -298,8 +298,8 @@
             <td class="text-center"> {{v.date}} </td>
             <td class="text-center">{{v.state}}</td>
             <td class="text-center">
-                <a href="post-edit.html?id=995" class="btn btn-default btn-xs">编辑</a>
-                <a href="#" data-id='{{v.id}}' class="btnbtn-danger btn-xs">删除</a>
+                <a href="article-edit.html?id={{v.id}}" class="btn btn-default btn-xs">编辑</a>
+                <a href="#" data-id='{{v.id}}' class="btnbtn-danger btn-xs btn-delete">删除</a>
             </td>
         </tr>
 
@@ -352,11 +352,13 @@
                         var html = template('art-list', res);
                         $('tbody').html(html);
 
+                        window.currentPage = $pagination.twbsPagination('getCurrentPage');
+
                         var totalPages = res.totalPage;
                         if (mytotalPage != totalPages) {
                             mytotalPage=totalPages;
 
-                            var currentPage = $pagination.twbsPagination('getCurrentPage');
+                            
                             $pagination.twbsPagination('destroy');
                             $pagination.twbsPagination($.extend({}, defaultOpts, {
                                 startPage: 1,
@@ -375,13 +377,28 @@
                 getData(1);
             });
 
-            // $('#btnSearch').trigger('click');
 
-            //分页插件
-            // $('.pagination').twbsPagination({
+           //需求:删除文章
+            $('tbody').on('click','.btn-delete',function(){
+                var that=this;
+                if(confirm('确认删除吗')){
+                    var id=$(this).attr('data-id');
+                    $.get({
+                        url:'http://localhost:8000/admin/article_delete',
+                        data:{id:id},
+                        success:function(res){
+                            if(res.code==200){
+                                getData(currentPage);
+                            }
+                        }
+                    });
+                }
+            });
 
-            // });
-        })
+           
+
+
+        });
 
     </script>
 </body>
